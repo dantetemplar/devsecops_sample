@@ -1,0 +1,69 @@
+name: CI
+
+# triggers pipeline when push is made to any branch (typical CI pipeline rule)
+on: [push]
+
+jobs:
+ sast_scan:
+   name: Run Bandit Scan
+   runs-on: ubuntu-latest
+
+   steps:
+   - name: Checkout code
+     uses: actions/checkout@v2
+
+   - name: Set up Python
+     uses: actions/setup-python@v2
+     with:
+       python-version: 3.8
+
+   - name: Install Bandit
+     run: pip install bandit
+
+   - name: Run Bandit Scan
+     #safe report in json format
+     run: bandit -ll -ii -r . -f json -o bandit-report.json
+
+   - name: Upload Artifact
+     uses: actions/upload-artifact@v3
+     #execute this step no matter of previous status
+     if: always()
+     with:
+        #how artifacts will be named when exported
+        name: bandit-findings.json
+        path: bandit-report.json
+
+ image_scan:
+ #each new job runs in a new isolated environment
+   name: Build and Run Image Scan
+   runs-on: ubuntu-latest
+
+   steps:
+   - name: Checkout code
+     uses: actions/checkout@v2
+
+   - name: Set up Docker
+     uses: docker-practice/actions-setup-docker@v1
+     with:
+      docker_version: '20.10.7'
+
+   - name: Build Docker Image
+     run: docker build -f Dockerfile -t mytestapp:latest . 
+
+   - name: Docker Scout Scan
+     uses: docker/scout-action@v1.15.1
+     with:
+       dockerhub-user: ${{ secrets.DOCKERHUB_USERNAME }} 
+       dockerhub-password: ${{ secrets.DOCKERHUB_PASSWORD }}
+       command: quickview,cves
+       only-severities: critical,high
+       sarif-file: scout-report.sarif
+       #exit code by default is true which means 0, add true to produce non success exit code when vulns are found
+       exit-code: true
+
+   - name: Upload Artifact
+     uses: actions/upload-artifact@v3
+     if: always()
+     with:
+       name: docker-scout-findings
+       path: scout-report.sarif
