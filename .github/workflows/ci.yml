@@ -71,19 +71,19 @@ jobs:
  dast_scan:
    name: Deploy and Scan PyGoat
    runs-on: ubuntu-latest
- 
+
    steps:
    - name: Checkout code
      uses: actions/checkout@v2
- 
+
    - name: Pull and Deploy PyGoat
      run: |
-       docker pull pygoat/pygoat:latest
-       docker run --rm -d -p 8000:8000 pygoat/pygoat:latest
-          
+       docker build -f Dockerfile -t mytestapp:latest . 
+       docker run --rm -d -p 8000:8000 mytestapp:latest
+
    - name: Install OWASP ZAP
      run: sudo snap install zaproxy --classic
-     
+
    - name: Run OWASP ZAP Scan
      run: |
        zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' http://localhost:8000
