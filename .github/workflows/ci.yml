@@ -73,6 +73,9 @@ jobs:
    runs-on: ubuntu-latest
  
    steps:
+     - name: Checkout code
+       uses: actions/checkout@v2
+
      - name: Pull and Deploy PyGoat
        run: |
          docker build -f Dockerfile -t mytestapp:latest . 
