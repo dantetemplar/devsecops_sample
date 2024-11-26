@@ -82,11 +82,13 @@ jobs:
          docker run --rm -d -p 8000:8000 --name pygoat mytestapp:latest
  
      - name: Install OWASP ZAP
-       run: sudo apt-get update && sudo apt-get install -y zaproxy
+       run: |
+         sudo snap install zaproxy --classic
+         pip install --upgrade zapcli
  
      - name: Run ZAP Baseline Scan
        run: |
-         zap-baseline.py -t http://127.0.0.1:8000 -r zap-report.html -J zap-report.json
+         zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' http://localhost:8000
  
      - name: Upload ZAP Report (HTML and JSON)
        uses: actions/upload-artifact@v3
