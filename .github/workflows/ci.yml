@@ -80,10 +80,10 @@ jobs:
      run: |
        docker pull pygoat/pygoat:latest
        docker run --rm -d -p 8000:8000 pygoat/pygoat:latest
-       
+          
    - name: Install OWASP ZAP
-     run: sudo apt-get update && sudo apt-get install -y zaproxy
-   
+     run: sudo snap install zaproxy --classic
+     
    - name: Run OWASP ZAP Scan
      run: |
        zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' http://localhost:8000
