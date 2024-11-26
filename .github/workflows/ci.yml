@@ -67,3 +67,17 @@ jobs:
      with:
        name: docker-scout-findings
        path: scout-report.sarif
+
+ dast_scan:
+   name: Deploy and Scan PyGoat
+   runs-on: ubuntu-latest
+ 
+   steps:
+   - name: Checkout code
+     uses: actions/checkout@v2
+ 
+   - name: Pull and Deploy PyGoat
+     run: |
+       docker pull pygoat/pygoat:latest
+       docker run --rm -d -p 8000:8000 pygoat/pygoat:latest
+ 
