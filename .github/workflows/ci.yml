@@ -75,8 +75,8 @@ jobs:
    steps:
      - name: Pull and Deploy PyGoat
        run: |
-         docker pull pygoat/pygoat:latest
-         docker run --rm -d -p 8000:8000 --name pygoat pygoat/pygoat:latest
+         docker build -f Dockerfile -t mytestapp:latest . 
+         docker run --rm -d -p 8000:8000 --name pygoat mytestapp:latest
  
      - name: Install OWASP ZAP
        run: sudo apt-get update && sudo apt-get install -y zaproxy
