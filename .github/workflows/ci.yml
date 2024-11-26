@@ -89,11 +89,13 @@ jobs:
      - name: Run ZAP Baseline Scan
        run: |
          zap-cli quick-scan --self-contained --start-options '-config api.disablekey=true' http://localhost:8000
- 
-     - name: Upload ZAP Report (HTML and JSON)
+
+     - name: Export ZAP Report
+       run: zap-cli report -o zap-report.html
+     
+     - name: Upload ZAP Report
        uses: actions/upload-artifact@v3
+       if: always()
        with:
          name: zap-findings
-         path: |
-           zap-report.html
-           zap-report.json
+         path: zap-report.html
